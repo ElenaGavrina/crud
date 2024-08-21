@@ -27,13 +27,14 @@ func getMovies(c *gin.Context) {
 }
 
 func getMovie(c *gin.Context) {
-	params := c.Param("id")
+	id := c.Param("id")
 	for _, item := range movies {
-		if item.ID == params {
+		if item.ID == id {
 			c.IndentedJSON(http.StatusOK, item)
 			return
 		}
 	}
+	c.IndentedJSON(http.StatusNotFound,error{"movie not found"})
 }
 
 func createMovie(c *gin.Context) {
@@ -49,24 +50,26 @@ func createMovie(c *gin.Context) {
 
 func updateMovie(c *gin.Context) {	
 	var movie Movie
-	if err:= c.ShouldBindJSON(&movie); err != nil {
-		c.JSON(http.StatusBadRequest,gin.H{"error": error{"bad_request"}})
-	}
-	params := c.Param("id")
-	for index, item := range movies {
-		if item.ID == params {
-			cur_movie := &movies[index]
-			cur_movie.Title = movie.Title
-			cur_movie.Director = movie.Director
+	err:= c.ShouldBindJSON(&movie)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest,error{"bad_request"})
+		return
+	} else {
+		params := c.Param("id")
+		for index, item := range movies {
+			if item.ID == params {
+				cur_movie := &movies[index]
+				cur_movie.Title = movie.Title
+				cur_movie.Director = movie.Director
 
-			c.IndentedJSON(http.StatusOK, movie)
-			return
+				c.IndentedJSON(http.StatusOK, movie)
+				return
+			}
 		}
 	}
-	
 }
 
-func deleteMovie( c *gin.Context) {
+func deleteMovie (c *gin.Context) {
 	params := c.Param("id")
 
 	for index, item := range movies {
@@ -79,7 +82,6 @@ func deleteMovie( c *gin.Context) {
 	c.IndentedJSON(http.StatusNotFound, error{"not_found"})
 }
 
-
 func main() {
 	movies = append(movies, Movie{ID: "1", Title: "What We Do in the Shadows", Director: &Director{Firstname: "Taika", Lastname: "Waititi"}})
 	movies = append(movies, Movie{ID: "2", Title: "Idioterne", Director: &Director{Firstname: "Lars", Lastname: "Trier"}})
@@ -88,15 +90,11 @@ func main() {
 	router := gin.Default()
 
 	router.GET("/movies", getMovies)
-	router.GET("/movies/{id}", getMovie)
+	router.GET("/movies/:id", getMovie)
 	router.POST("/movies", createMovie)
-	router.PUT("/movies/{id}", updateMovie)
-	router.DELETE("/movies/{id}", deleteMovie)
-	
+	router.PUT("/movies/:id", updateMovie)
+	router.DELETE("/movies/:id", deleteMovie)
 	
 	http.ListenAndServe(":8080", router)
 
 }
-
-
-
