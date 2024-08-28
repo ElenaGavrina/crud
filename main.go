@@ -20,7 +20,11 @@ type Director struct {
 	Lastname  string `json:"lastname"`
 }
 
-var movies []Movie
+var movies =[]Movie{
+	{ID: "1", Title: "What We Do in the Shadows", Director: &Director{Firstname: "Taika", Lastname: "Waititi"}},
+	{ID: "2", Title: "Idioterne", Director: &Director{Firstname: "Lars", Lastname: "Trier"}},
+	{ID: "3", Title: " Chaising Amy", Director: &Director{Firstname: "Kevin", Lastname: "Smith"}},
+}
 
 func getMovies(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, movies)
@@ -83,10 +87,6 @@ func deleteMovie (c *gin.Context) {
 }
 
 func main() {
-	movies = append(movies, Movie{ID: "1", Title: "What We Do in the Shadows", Director: &Director{Firstname: "Taika", Lastname: "Waititi"}})
-	movies = append(movies, Movie{ID: "2", Title: "Idioterne", Director: &Director{Firstname: "Lars", Lastname: "Trier"}})
-	movies = append(movies, Movie{ID: "3", Title: " Chaising Amy", Director: &Director{Firstname: "Kevin", Lastname: "Smith"}})
-	
 	router := gin.Default()
 
 	router.GET("/movies", getMovies)
